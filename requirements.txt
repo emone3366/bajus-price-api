@@ -1,0 +1,37 @@
+# Core framework
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Database
+sqlalchemy[asyncio]
+asyncpg
+alembic
+
+# Redis
+redis[hiredis]
+
+# HTTP client
+httpx
+
+# Headless browser
+playwright
+
+# Scheduler (using asyncio loop instead)
+# apscheduler
+
+# Auth & security
+passlib[bcrypt]
+
+# Alerts
+aiosmtplib
+
+# Stripe billing
+stripe
+
+# Utilities
+python-dotenv
+
+# Testing
+pytest
