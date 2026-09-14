@@ -71,10 +71,17 @@ class Settings(BaseSettings):
     redis_host: str = "redis"
     redis_port: int = 6379
     redis_db: int = 0
+    redis_url_override: str | None = None
 
     @property
     def redis_url(self) -> str:
         """Redis connection string."""
+        if self.redis_url_override:
+            # Upstash often requires TLS (rediss://)
+            if self.redis_url_override.startswith("redis://"):
+                return self.redis_url_override.replace("redis://", "rediss://", 1)
+            return self.redis_url_override
+            
         return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
     # --- Scraper ---
