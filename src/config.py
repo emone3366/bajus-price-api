@@ -30,27 +30,41 @@ class Settings(BaseSettings):
     postgres_user: str = "priceapi"
     postgres_password: str = "change_me_in_production"
     postgres_db: str = "bajus_prices"
+    database_url_override: str | None = None
 
     @property
     def database_url(self) -> str:
         """Async connection string (PostgreSQL or SQLite fallback)."""
+        if self.database_url_override:
+            # SQLAlchemy asyncpg needs postgresql+asyncpg://
+            if self.database_url_override.startswith("postgres://"):
+                return self.database_url_override.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif self.database_url_override.startswith("postgresql://"):
+                return self.database_url_override.replace("postgresql://", "postgresql+asyncpg://", 1)
+            return self.database_url_override
+
         if self.postgres_host.lower() == "sqlite":
             return f"sqlite+aiosqlite:///{self.postgres_db}.sqlite3"
 
         return (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
-            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}?ssl=require"
         )
 
     @property
     def database_url_sync(self) -> str:
         """Sync connection string for Alembic migrations."""
+        if self.database_url_override:
+            if self.database_url_override.startswith("postgres://"):
+                return self.database_url_override.replace("postgres://", "postgresql://", 1)
+            return self.database_url_override
+
         if self.postgres_host.lower() == "sqlite":
             return f"sqlite:///{self.postgres_db}.sqlite3"
 
         return (
             f"postgresql://{self.postgres_user}:{self.postgres_password}"
-            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}?sslmode=require"
         )
 
     # --- Redis ---
