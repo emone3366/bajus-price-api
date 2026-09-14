@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/main.py"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/v1/cron/scrape",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}
